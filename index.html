@@ -50,10 +50,29 @@
     margin-top: 4px;
   }
 
+  .previewBox {
+    background: #111;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: none;
+    font-size: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .previewBox span {
+    color: #00eaff;
+    font-weight: bold;
+  }
+
   .center-btn {
     display: none;
     justify-content: center;
-    margin: 20px 0;
+    margin-bottom: 20px;
   }
 
   #processBtn {
@@ -74,7 +93,7 @@
   }
 
   .custom-box {
-    margin-top: 20px;
+    margin-top: 0;
     padding: 12px;
     background: #1a1a1a;
     border-radius: 10px;
@@ -89,14 +108,6 @@
     margin-top: 6px;
     background: #0f0f0f;
     color: #fff;
-  }
-
-  .previewBox {
-    margin-top: 20px;
-    background: #111;
-    padding: 14px;
-    border-radius: 10px;
-    display: none;
   }
 </style>
 </head>
@@ -113,6 +124,12 @@
   <div class="amount-box" data-amount="10000">₹10,000+<span class="bonus-tag">+70% Bonus</span></div>
 </div>
 
+<div class="previewBox" id="preview">
+  <div><b>Deposit:</b> ₹<span id="p_amount">0</span></div>
+  <div><b>Bonus:</b> ₹<span id="p_bonus">0</span></div>
+  <div><b>Total:</b> ₹<span id="p_total">0</span></div>
+</div>
+
 <div class="center-btn" id="centerBtn">
   <button id="processBtn">Proceed to Add Payment</button>
 </div>
@@ -120,12 +137,6 @@
 <div class="custom-box">
   <label>Custom Amount (₹300 – ₹82,000)</label>
   <input type="number" id="customInput" placeholder="Enter amount">
-</div>
-
-<div class="previewBox" id="preview">
-  <p><b>Deposit:</b> ₹<span id="p_amount"></span></p>
-  <p><b>Bonus:</b> ₹<span id="p_bonus"></span></p>
-  <p><b>Total:</b> ₹<span id="p_total"></span></p>
 </div>
 
 <script>
@@ -155,7 +166,7 @@ function updatePreview() {
   document.getElementById("p_bonus").innerText = Math.floor(bonusAmount);
   document.getElementById("p_total").innerText = Math.floor(totalAmount);
 
-  preview.style.display = "block";
+  preview.style.display = "flex";
   centerBtn.style.display = "flex";
 }
 
