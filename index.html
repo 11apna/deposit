@@ -1,3 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deposit</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 20px;
+        background: #0d0d0d;
+        color: #fff;
+        font-family: Arial, sans-serif;
+    }
+
+    h2 {
+        text-align: center;
+        margin-top: 10%;
+        margin-bottom: 20px;
+    }
+
+    .amount-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .amount-box {
+        background: #1a1a1a;
+        padding: 14px;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 18px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .amount-box.active {
+        border: 2px solid #00eaff;
+        background: #002c35;
+    }
+
+    .bonus-tag {
+        display: block;
+        font-size: 12px;
+        opacity: 0.7;
+        margin-top: 4px;
+    }
+
+    .custom-box {
+        margin-top: 20px;
+        padding: 12px;
+        background: #1a1a1a;
+        border-radius: 10px;
+    }
+
+    input {
+        width: 100%;
+        padding: 14px;
+        border-radius: 10px;
+        border: none;
+        font-size: 18px;
+        margin-top: 6px;
+        background: #0f0f0f;
+        color: #fff;
+    }
+
+    #processBtn {
+        margin-top: 25px;
+        width: 100%;
+        padding: 16px;
+        font-size: 20px;
+        border: none;
+        background: #00eaff;
+        color: #000;
+        border-radius: 12px;
+        cursor: pointer;
+        opacity: 0.4;
+        pointer-events: none;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 0 rgba(0, 234, 255, 0);
+    }
+
+    #processBtn.active {
+        opacity: 1;
+        pointer-events: auto;
+        box-shadow: 0 0 20px rgba(0, 234, 255, 0.6), 0 0 40px rgba(0, 234, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .previewBox {
+        margin-top: 20px;
+        background: #111;
+        padding: 14px;
+        border-radius: 10px;
+        display: none;
+    }
+</style>
+</head>
+<body>
+
+<h2>Add Deposit</h2>
+
+<div class="amount-grid">
+    <div class="amount-box" data-amount="300">₹300</div>
+
+    <div class="amount-box" data-amount="500">
+        ₹500
+        <span class="bonus-tag">+10% Bonus</span>
+    </div>
+
+    <div class="amount-box" data-amount="1000">
+        ₹1000
+        <span class="bonus-tag">+20% Bonus</span>
+    </div>
+
+    <div class="amount-box" data-amount="5000">
+        ₹5000
+        <span class="bonus-tag">+30% Bonus</span>
+    </div>
+
+    <div class="amount-box" data-amount="7000">
+        ₹7000
+        <span class="bonus-tag">+40% Bonus</span>
+    </div>
+
+    <div class="amount-box" data-amount="10000">
+        ₹10,000+
+        <span class="bonus-tag">+70% Bonus</span>
+    </div>
+</div>
+
+<div class="custom-box">
+    <label>Custom Amount (₹300 – ₹82,000)</label>
+    <input type="number" id="customInput" placeholder="Enter amount">
+</div>
+
+<div class="previewBox" id="preview">
+    <p><b>Deposit:</b> ₹<span id="p_amount"></span></p>
+    <p><b>Bonus:</b> ₹<span id="p_bonus"></span></p>
+    <p><b>Total:</b> ₹<span id="p_total"></span></p>
+</div>
+
+<button id="processBtn">Proceed To Add Payment</button>
+
+<script>
+let selectedAmount = null;
+let totalAmount = null;
+let bonusAmount = null;
+
+const boxes = document.querySelectorAll(".amount-box");
+const customInput = document.getElementById("customInput");
+const processBtn = document.getElementById("processBtn");
+const preview = document.getElementById("preview");
+
+function calcBonus(amount) {
+    if (amount >= 10000) return amount * 0.70;
+    if (amount >= 7000) return amount * 0.40;
+    if (amount >= 5000) return amount * 0.30;
+    if (amount >= 1000) return amount * 0.20;
+    if (amount >= 500) return amount * 0.10;
+    return 0;
+}
+
+boxes.forEach(box => {
+    box.addEventListener("click", () => {
+        boxes.forEach(b => b.classList.remove("active"));
+        box.classList.add("active");
+
+        customInput.value = "";
+        selectedAmount = parseInt(box.dataset.amount);
+        
+        bonusAmount = calcBonus(selectedAmount);
+        totalAmount = selectedAmount + bonusAmount;
+
+        updatePreview();
+    });
+});
+
+customInput.addEventListener("input", () => {
+    boxes.forEach(b => b.classList.remove("active"));
+    let v = parseInt(customInput.value);
+
+    if (!v || v < 300 || v > 82000) {
+        selectedAmount = null;
+        processBtn.classList.remove("active");
+        preview.style.display = "none";
+        return;
+    }
+
+    selectedAmount = v;
+    bonusAmount = calcBonus(v);
+    totalAmount = v + bonusAmount;
+
+    updatePreview();
+});
+
+function updatePreview() {
+    if (!selectedAmount) return;
+
+    document.getElementById("p_amount").innerText = selectedAmount;
+    document.getElementById("p_bonus").innerText = Math.floor(bonusAmount);
+    document.getElementById("p_total").innerText = Math.floor(totalAmount);
+
+    preview.style.display = "block";
+    processBtn.classList.add("active");
+}
+
+processBtn.addEventListener("click", () => {
+    if (!selectedAmount) return;
+    window.location.href = `/dc#${selectedAmount}`;
+});
+</script>
+
+</body>
+</html>
 <!-- Floating Top Bar -->
 <div class="killer-top-bar">
   <div class="brand-box">
