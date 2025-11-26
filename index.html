@@ -1,196 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deposit</title>
-
-<style>
-    /* ---------- BASIC RESET ---------- */
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{
-        margin:0;
-        padding:20px 20px calc(20px + 80px) 20px; /* <-- extra 80px for nav */
-        background:#0d0d0d;
-        color:#fff;
-        font-family:Arial,sans-serif;
-        min-height:100vh;
-    }
-
-    h2{text-align:center;margin-top:10%;margin-bottom:20px}
-
-    .amount-grid{
-        display:grid;
-        grid-template-columns:repeat(2,1fr);
-        gap:12px;
-    }
-    .amount-box{
-        background:#1a1a1a;
-        padding:14px;
-        border-radius:10px;
-        text-align:center;
-        font-size:18px;
-        border:2px solid transparent;
-        cursor:pointer;
-        transition:.2s;
-    }
-    .amount-box.active{
-        border:2px solid #00eaff;
-        background:#002c35;
-    }
-    .bonus-tag{display:block;font-size:12px;opacity:.7;margin-top:4px}
-
-    .custom-box{margin-top:20px;padding:12px;background:#1a1a1a;border-radius:10px}
-    input{
-        width:100%;
-        padding:14px;
-        border-radius:10px;
-        border:none;
-        font-size:18px;
-        margin-top:6px;
-        background:#0f0f0f;
-        color:#fff;
-    }
-
-    #processBtn{
-        margin-top:25px;
-        width:100%;
-        padding:16px;
-        font-size:20px;
-        border:none;
-        background:#00eaff;
-        color:#000;
-        border-radius:12px;
-        cursor:pointer;
-        opacity:.4;
-        pointer-events:none;
-        font-weight:bold;
-        position:relative;
-        z-index:99999999;  /* <-- above nav */
-    }
-    #processBtn.active{opacity:1;pointer-events:auto}
-
-    .previewBox{
-        margin-top:20px;
-        background:#111;
-        padding:14px;
-        border-radius:10px;
-        display:none;
-    }
-</style>
-</head>
-<body>
-
-<h2>Add Deposit</h2>
-
-<div class="amount-grid">
-    <div class="amount-box" data-amount="300">₹300</div>
-    <div class="amount-box" data-amount="500">₹500<span class="bonus-tag">+10% Bonus</span></div>
-    <div class="amount-box" data-amount="1000">₹1000<span class="bonus-tag">+20% Bonus</span></div>
-    <div class="amount-box" data-amount="5000">₹5000<span class="bonus-tag">+30% Bonus</span></div>
-    <div class="amount-box" data-amount="7000">₹7000<span class="bonus-tag">+40% Bonus</span></div>
-    <div class="amount-box" data-amount="10000">₹10,000+<span class="bonus-tag">+70% Bonus</span></div>
-</div>
-
-<div class="custom-box">
-    <label>Custom Amount (₹300 – ₹82,000)</label>
-    <input type="number" id="customInput" placeholder="Enter amount">
-</div>
-
-<div class="previewBox" id="preview">
-    <p><b>Deposit:</b> ₹<span id="p_amount"></span></p>
-    <p><b>Bonus:</b> ₹<span id="p_bonus"></span></p>
-    <p><b>Total:</b> ₹<span id="p_total"></span></p>
-</div>
-
-<button id="processBtn">Proceed To Add Payment</button>
-
-<script>
-let selectedAmount=null,totalAmount=null,bonusAmount=null;
-const boxes=document.querySelectorAll(".amount-box");
-const customInput=document.getElementById("customInput");
-const processBtn=document.getElementById("processBtn");
-const preview=document.getElementById("preview");
-
-function calcBonus(a){
-    if(a>=10000)return a*.70;
-    if(a>=7000)return a*.40;
-    if(a>=5000)return a*.30;
-    if(a>=1000)return a*.20;
-    if(a>=500)return a*.10;
-    return 0;
-}
-function updatePreview(){
-    if(!selectedAmount)return;
-    document.getElementById("p_amount").innerText=selectedAmount;
-    document.getElementById("p_bonus").innerText=Math.floor(bonusAmount);
-    document.getElementById("p_total").innerText=Math.floor(totalAmount);
-    preview.style.display="block";
-    processBtn.classList.add("active");
-}
-boxes.forEach(box=>{
-    box.addEventListener("click",()=>{
-        boxes.forEach(b=>b.classList.remove("active"));
-        box.classList.add("active");
-        customInput.value="";
-        selectedAmount=parseInt(box.dataset.amount);
-        bonusAmount=calcBonus(selectedAmount);
-        totalAmount=selectedAmount+bonusAmount;
-        updatePreview();
-    });
-});
-customInput.addEventListener("input",()=>{
-    boxes.forEach(b=>b.classList.remove("active"));
-    let v=parseInt(customInput.value);
-    if(!v||v<300||v>82000){
-        selectedAmount=null;
-        processBtn.classList.remove("active");
-        preview.style.display="none";
-        return;
-    }
-    selectedAmount=v;
-    bonusAmount=calcBonus(v);
-    totalAmount=v+bonusAmount;
-    updatePreview();
-});
-processBtn.addEventListener("click",()=>{
-    if(!selectedAmount)return;
-    window.location.href="/dc#"+selectedAmount;
-});
-</script>
-
-<!-- ===== TOP BAR ===== -->
+<!-- Floating Top Bar -->
 <div class="killer-top-bar">
   <div class="brand-box">
     <img src="https://d13ir53smqqeyp.cloudfront.net/d11-static-pages/images/dream11LogoWhite.webp" class="brand-img">
     <span class="pro-badge">PRO</span>
   </div>
+
+  <!-- Username center -->
   <span id="userName" class="user-name"></span>
+
+  <!-- Wallet right -->
   <button id="walletBtn" class="wallet-btn">₹0</button>
 </div>
+
 <style>
 .killer-top-bar{
-  position:fixed;top:14px;left:50%;transform:translateX(-50%);
-  width:calc(100% - 32px);max-width:760px;height:62px;
-  background:linear-gradient(180deg, rgba(10,12,20,0.85), rgba(12,14,24,0.6));
-  border-radius:16px;border:1px solid rgba(255,255,255,0.05);
-  backdrop-filter:blur(8px) saturate(120%);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 14px;box-shadow:0 10px 26px rgba(0,0,0,0.45);
-  z-index:9999999;
+  position: fixed;top: 14px;left: 50%;transform: translateX(-50%);
+  width: calc(100% - 32px);max-width: 760px;height: 62px;
+  background: linear-gradient(180deg, rgba(10,12,20,0.85), rgba(12,14,24,0.6));
+  border-radius: 16px;border: 1px solid rgba(255,255,255,0.05);
+  backdrop-filter: blur(8px) saturate(120%);
+  display: flex;align-items: center;justify-content: space-between;
+  padding: 0 14px;box-shadow: 0 10px 26px rgba(0,0,0,0.45);
+  z-index: 9999999;
 }
-.brand-box{display:flex;align-items:center;gap:8px}
-.brand-img{width:115px;filter:drop-shadow(0 0 10px rgba(255,255,255,0.4))}
-.pro-badge{background:linear-gradient(90deg,#ff006a,#ff7e00);padding:3px 10px;border-radius:8px;color:#fff;font-size:13px;font-weight:700}
-.user-name{position:absolute;left:50%;transform:translateX(-50%);font-size:15px;font-weight:700;color:#fff;text-transform:capitalize}
-.wallet-btn{background:linear-gradient(90deg,rgba(0,255,209,0.22),rgba(122,95,255,0.22));padding:8px 14px;border-radius:12px;font-size:14px;font-weight:700;border:1px solid rgba(255,255,255,0.1);color:#fff}
+.brand-box{display: flex;align-items:center;gap:8px;}
+.brand-img{width:115px;filter: drop-shadow(0 0 10px rgba(255,255,255,0.4));}
+.pro-badge{background:linear-gradient(90deg,#ff006a,#ff7e00);padding:3px 10px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;}
+.user-name{position:absolute;left:50%;transform:translateX(-50%);font-size:15px;font-weight:700;color:#fff;text-transform:capitalize;}
+.wallet-btn{
+  background:linear-gradient(90deg,rgba(0,255,209,0.22),rgba(122,95,255,0.22));
+  padding:8px 14px;border-radius:12px;font-size:14px;font-weight:700;
+  border:1px solid rgba(255,255,255,0.1);color:#fff;
+}
 </style>
+
 <script>
-(function(){
-  const w=document.getElementById("walletBtn"),u=document.getElementById("userName");
-  let h=location.hash.replace("#","");if(h.includes("#")){const p=h.split("#");if(p[0])localStorage.setItem("APP_USER",p[0]);if(p[1]&&!isNaN(p[1]))localStorage.setItem("APP_BALANCE",p[1]);history.replaceState(null,"",location.pathname+location.search);}
-  u.textContent=localStorage.getItem("APP_USER")||"Guest";
-  w.textContent="₹"+(localStorage.getItem("APP_BALANCE")||"0");
+(function() {
+  const walletBtn = document.getElementById("walletBtn");
+  const userName = document.getElementById("userName");
+
+  // Read hash: #username#balance
+  let hash = location.hash.replace("#", "");
+  if (hash.includes("#")) {
+    const parts = hash.split("#");
+    const u = parts[0] || "";
+    const b = parts[1] || "0";
+
+    if (u) localStorage.setItem("APP_USER", u);
+    if (b && !isNaN(b)) localStorage.setItem("APP_BALANCE", b);
+
+    // Remove hash from URL
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+
+  // Load saved values
+  const savedUser = localStorage.getItem("APP_USER") || "Guest";
+  const savedBal = localStorage.getItem("APP_BALANCE") || "0";
+
+  userName.textContent = savedUser;
+  walletBtn.textContent = "₹" + savedBal;
+
 })();
 </script>
 
